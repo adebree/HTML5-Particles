@@ -57,28 +57,15 @@ function ImageParticle( ctx, img ) {
     
     this.draw = function()
     {    
-        // save the current canvas state
         ctx.save();     
         
-		// set the alpha to the particle's alpha
 		ctx.globalAlpha = this.alpha;         
-    
-        // move to where the particle should be
 		ctx.translate( this.x, this.y );
-		
-		// scale it dependent on the size of the particle
         ctx.scale( this.size, this.size );
-								
-		// move the draw position to the center of the image
 		ctx.translate( img.width * -0.5, img.width * -0.5 );
-				
-		// set the composition mode
-		ctx.globalCompositeOperation = "light";
-				
-		// and draw it! 
+		ctx.globalCompositeOperation = "light";				
 		ctx.drawImage( img, 0, 0 );
-		
-		// and restore the canvas state
+
 		ctx.restore();		
     };
     
