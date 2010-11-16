@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset=utf-8 />
+<title>Particles</title>
+
+<style>
+    body {
+        background-color: #000;
+        color: #fff;
+        font-family: sans-serif;
+        font-size: 0.8em;
+    }
+    
+    ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;  
+    }
+    
+    li {
+        margin: 0;
+        padding: 0;
+    }
+    
+    canvas {
+        border: 1px solid blue;
+        float: left;
+    }
+    
+    #controls {
+        float: left;
+        background-color:   #666666;
+    }
+    
+    #controls label {
+        display:    block;
+        float:      left;
+        width:      100px;
+        
+    }
+    
+    #controls li.sep {
+        border: 1px solid white;
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+    
+    #controls input[type='range'] {
+        background-color: #cccccc;
+    }
+</style>
+
+</head>
+<body>
+    <canvas></canvas>
+    
+    <fieldset id="controls">
+        <ul>
+            <li><label>FPS: </label><span id="fps"></span></li>
+            <li class="sep" />
+            <li><label>Show grid: </label><input name="cbGrid" type="checkbox" checked /></li>
+            <li><label>Rotation X: </label><input name="rRotationX" type="range" min="0" value="56" max="100" /></li>            
+            <li><label>Rotation Y: </label><input name="rRotationY" type="range" min="0" value="54" max="100" /></li>            
+            <li><label>Rotation Z: </label><input name="rRotationZ" type="range" min="0" value="51" max="100" /></li>        
+            <li><label>Nr particles: </label><input name="rMaxParticles" type="range" min="0" value="60" max="500" /></li>                                    
+        </ul>
+    </fieldset>
+
+    <script src="Line3D.js"></script>
+    <script src="Point3D.js"></script>    
+    <script src="Particle.js"></script>
+    <script src="Grid.js"></script>
+    
+    <script type="text/javascript">
+    
+        var ctx = document.querySelector( "canvas" ).getContext( "2d" ),
+            w = ctx.canvas.width  = 800,
+            h = ctx.canvas.height = 500,
+            midX = w / 2,
+            midY = h / 2,
+            lastLoop = 0,
+            grid,
+            rotationY = .2,
+            rotationZ = .05,
+            rotationX = .3,
+            maxParticles = 60,
+            particles = []
+        ;
+            
+        
+        var cbGrid          = document.querySelector( "input[name='cbGrid']" ),
+            rRotationY      = document.querySelector( "input[name='rRotationY']" ),
+            rRotationX      = document.querySelector( "input[name='rRotationX']" ),
+            rRotationZ      = document.querySelector( "input[name='rRotationZ']" ),
+            rMaxParticles   = document.querySelector( "input[name='rMaxParticles']" ),
+            stFps           = document.querySelector( "#fps" )
+        ;
+        
+        var TO_RADIANS = Math.PI / 180,
+            FOV = 500;
+        
+        
+        function setup()
+        {
+            ctx.translate( midX, midY );   
+            ctx.globalCompositeOperation = "light";
+            
+            grid = new Grid( ctx, 250 );
+            grid.draw();               
+            
+            // Setup event listeners
+            //
+            cbGrid.addEventListener( "change", function( event ) { grid.show( this.checked ); }, false );
+            
+            rRotationY.addEventListener( "change", function( event ) { rotationY = ( this.value - 50 ) / 10 } );
+            rRotationX.addEventListener( "change", function( event ) { rotationX = ( this.value - 50 ) / 10 } );            
+            rRotationZ.addEventListener( "change", function( event ) { rotationZ = ( this.value - 50 ) / 10 } );    
+            rMaxParticles.addEventListener( "change", function( event ) { maxParticles = this.value } );                                                
+        }
+        
+        function generateParticle() 
+        {    
+            var p = new Particle( ctx, midX );        
+        
+            resetParticle( p );        
+            
+            return p;
+        }
+        
+        function resetParticle( p ) 
+        {
+            p.point = new Point3D( rand( -midX / 2, midX / 2 ), rand( -midX / 2, midX / 2 ), rand( -midX / 2, midX / 2 ) );
+            p.size = 1;
+            
+            return p;    
+        }    
+        
+        function loop()
+        {
+            var now = +new Date();
+            stFps.innerHTML = Math.round( 1000 / ( now - lastLoop ) );
+            
+            var nrParticles = particles.length;
+            
+            ctx.fillStyle = "rgba( 0,0,0,1 )";
+            ctx.fillRect( -midX, -midY, w, h );
+    
+            grid.rotateY( rotationY );
+            grid.rotateX( rotationX );            
+            grid.rotateZ( rotationZ );                        
+            
+            grid.draw();       
+        
+            while ( nrParticles < maxParticles )
+            {
+                particles.push( generateParticle() );
+                nrParticles++;
+            }
+            
+            while ( nrParticles > maxParticles )
+            {
+                particles.shift();
+                nrParticles--;
+            }
+        
+            for ( var i = 0, l = particles.length; i < l; i++ )
+            {
+                var p = particles[ i ];
+    
+                p.rotateY( rotationY );
+                p.rotateX( rotationX );                
+                p.rotateZ( rotationZ );                                
+                
+                p.draw();                        
+            }
+            
+            lastLoop = now;
+        }
+        
+        function rand( min, max )
+        {
+        	return (( Math.random() * ( max - min )) + min ); 
+        }
+        
+        setup();
+        setInterval( loop, 1000 / 30 );
+        
+    </script>
+
+</body>
+</html>

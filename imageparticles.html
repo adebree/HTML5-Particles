@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset=utf-8 />
+<title>Particles</title>
+
+<style>
+    body {
+        background-color: #000;
+        color: #fff;
+        font-family: sans-serif;
+        font-size: 0.8em;
+    }
+    
+    ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;  
+    }
+    
+    li {
+        margin: 0;
+        padding: 0;
+    }
+    
+    canvas {
+        border: 1px solid blue;
+    }
+</style>
+
+</head>
+<body>
+    <ul>
+        <li>FPS: <span id="fps"></span></li>
+        <li>Particles: <span id="particles"></span></li>
+    </ul>
+    <canvas></canvas>
+    
+    <script src="ImageParticle.js"></script>
+    <script type="text/javascript">
+    
+    var ctx = document.querySelector( "canvas" ).getContext( "2d" ),
+        w = ctx.canvas.width  = 1200,
+        h = ctx.canvas.height = 600,
+        midX = w / 2,
+        midY = h / 2,
+        mouseX = midX,
+        mouseY = midY / 2,
+        lastLoop = 0,
+        stFps = document.querySelector( "#fps" ),
+        stParticles = document.querySelector( "#particles" ),
+        particleImage = new Image();
+    
+    var MAX_NR_PARTICLES        = 300,
+        NR_OF_NEW_PARTICLES     = 300;
+    
+    var particles = [];
+    
+    function setup()
+    {
+        particleImage.src = "ParticleBlue.png";
+    
+        ctx.fillStyle = "#000";
+        ctx.fillRect( 0, 0, w, h );           
+        
+        
+    }
+    
+        document.addEventListener( "mousemove", function( e )
+        {
+            e.preventFault();
+            
+            mouseX = e.clientX; 
+            mouseY = e.clientY;
+        }, false );
+    
+    
+    function generateParticle() 
+    {    
+        var p = new ImageParticle( ctx, particleImage );        
+    
+        resetParticle( p );        
+        
+        return p;
+    }
+    
+    function resetParticle( p ) 
+    {
+        p.x         = mouseX;
+        p.y         = mouseY;
+        p.xVel      = rand( -20, 20 );
+        p.yVel      = rand( -15, 10 );
+        p.size      = rand( 0.2, 0.7 );
+        p.xDrag     = 0.99;
+        p.yDrag     = 0.99;
+        p.shrink    = 0.99;
+        p.bounce    = rand( 0.5, 0.8 );
+        p.fade      = 0.008;
+        p.alpha     = 1;
+
+        return p;    
+    }
+    
+    function loop()
+    {
+        var now = +new Date();
+        var nrParticles = particles.length;
+        
+        stFps.innerHTML = Math.round( 1000 / ( now - lastLoop ) );
+        stParticles.innerHTML = nrParticles;
+        
+        ctx.fillStyle = "rgba( 0,0,0,0.3 )";
+        ctx.fillRect( 0, 0, w, h );
+        
+        
+        var i = 0;
+        while ( nrParticles < MAX_NR_PARTICLES && i < NR_OF_NEW_PARTICLES )
+        {
+            i++;
+            particles.push( generateParticle() );
+            nrParticles++;
+        }
+    
+        for ( var i = 0, l = particles.length; i < l; i++ )
+        {
+            var p = particles[ i ];
+
+            p.draw();        
+        
+
+            p.update();
+            
+            if ( p.isStopped() )
+            {
+                resetParticle( particles[ i ] );
+            }
+            
+
+        }
+        
+        lastLoop = now;
+    }
+    
+    function rand( min, max )
+    {
+    	return (( Math.random() * ( max - min )) + min ); 
+    }
+    
+    setup();
+    setInterval( loop, 1000 / 30 );
+    
+        
+    </script>
+
+</body>
+</html>
