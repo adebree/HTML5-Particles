@@ -50,3 +50,4 @@ var Line3D = function( startPoint3D, stopPoint3D, color )
         ctx.stroke();                  
     }    
 }
+

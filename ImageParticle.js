@@ -1,3 +1,4 @@
+
 function ImageParticle( ctx, img ) {
 
     var STOPPED_VEL     = 0.05,     // velocity to be considerd as being stopped

@@ -45,8 +45,7 @@ function Particle( ctx ) {
         {
             this.y = cHeight;
             this.yVel *= -this.bounce;
-        }
-        
+        }  
     };
     
     this.draw = function()

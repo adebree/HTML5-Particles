@@ -30,6 +30,5 @@ function Particle3D( ctx, max ) {
     this.draw = function()
     {
         this.point.draw( ctx, this.color, this.max );    
-    };
-    
+    };   
 }
